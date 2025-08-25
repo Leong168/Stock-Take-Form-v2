@@ -28,11 +28,6 @@
   <div class="container py-3">
 
     <h3 class="text-center mb-3">📦 SKU Scanner</h3>
-<!-- Camera Selector -->
-<div class="mb-3">
-  <label for="cameraSelect" class="form-label">Select Camera</label>
-  <select id="cameraSelect" class="form-select" onchange="switchCamera(this.value)"></select>
-</div>
 
     <!-- QR Scanner -->
     <div id="reader" class="mb-3"></div>
@@ -83,74 +78,26 @@
     const html5QrCode = new Html5Qrcode("reader");
     const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-   let html5QrCode;
-   let currentCameraId = '';
-   let cameraList = [];
-
-   function initScanner() {
-     // First create the instance
-     html5QrCode = new Html5Qrcode("reader");
-
-     // Request permission by starting/stopping a quick scan
-     Html5Qrcode.getCameras().then(cameras => {
-       if (!cameras || cameras.length === 0) {
-         alert("No camera found.");
-         return;
-       }
-
-       cameraList = cameras;
-       const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
-       currentCameraId = backCamera.id;
-
-       populateCameraOptions(cameras);
-       startCamera(currentCameraId);
-     }).catch(err => {
-       console.error("Camera error:", err);
-       alert("Could not access camera. Please allow camera permissions.");
-     });
-   }
-
-   function populateCameraOptions(cameras) {
-     const select = document.getElementById('cameraSelect');
-     select.innerHTML = '';
-
-     cameras.forEach((camera, index) => {
-      const option = document.createElement('option');
-      option.value = camera.id;
-      option.textContent = camera.label || `Camera ${index + 1}`;
-      if (camera.id === currentCameraId) {
-        option.selected = true;
-      }
-      select.appendChild(option);
-    });
-  }
-
-  function startCamera(cameraId) {
-    html5QrCode.start(
-      cameraId,
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      qrMessage => {
-        html5QrCode.pause();
-        handleScan(qrMessage);
+    function startScanner() {
+      Html5Qrcode.getCameras().then(cameras => {
+        if (!cameras || cameras.length === 0) {
+          alert("No camera found.");
+          return;
+        }
+        const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
+        html5QrCode.start(
+          { facingMode: "environment" },
+          qrConfig,
+          qrMessage => {
+            html5QrCode.pause();
+            handleScan(qrMessage);
+          }
+        );
+      }).catch(err => {
+        console.error("Camera error:", err);
+        alert("Could not start scanner.");
+      });
     }
-  ).then(() => {
-    currentCameraId = cameraId;
-  }).catch(err => {
-    console.error("Failed to start camera:", err);
-  });
-}
-
-   function switchCamera(newCameraId) {
-     if (newCameraId === currentCameraId) return;
-
-     html5QrCode.stop().then(() => {
-       html5QrCode.clear();
-       startCamera(newCameraId);
-     }).catch(err => {
-      console.error("Error switching camera:", err);
-      alert("Could not switch camera.");
-  });
-}
 
     function handleScan(sku) {
       lastScannedSKU = sku;
@@ -213,7 +160,7 @@
     }
 
     // ✅ Start scanner after full page load
-    window.addEventListener("load", initScanner);
+    window.addEventListener("load", startScanner);
   </script>
 </body>
 </html>
