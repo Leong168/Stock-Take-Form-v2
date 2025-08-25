@@ -84,54 +84,54 @@
     const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
    let html5QrCode;
-let currentCameraId = '';
-let cameraList = [];
+   let currentCameraId = '';
+   let cameraList = [];
 
-function initScanner() {
-  // First create the instance
-  html5QrCode = new Html5Qrcode("reader");
+   function initScanner() {
+     // First create the instance
+     html5QrCode = new Html5Qrcode("reader");
 
-  // Request permission by starting/stopping a quick scan
-  Html5Qrcode.getCameras().then(cameras => {
-    if (!cameras || cameras.length === 0) {
-      alert("No camera found.");
-      return;
-    }
+     // Request permission by starting/stopping a quick scan
+     Html5Qrcode.getCameras().then(cameras => {
+       if (!cameras || cameras.length === 0) {
+         alert("No camera found.");
+         return;
+       }
 
-    cameraList = cameras;
-    const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
-    currentCameraId = backCamera.id;
+       cameraList = cameras;
+       const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
+       currentCameraId = backCamera.id;
 
-    populateCameraOptions(cameras);
-    startCamera(currentCameraId);
-  }).catch(err => {
-    console.error("Camera error:", err);
-    alert("Could not access camera. Please allow camera permissions.");
-  });
-}
+       populateCameraOptions(cameras);
+       startCamera(currentCameraId);
+     }).catch(err => {
+       console.error("Camera error:", err);
+       alert("Could not access camera. Please allow camera permissions.");
+     });
+   }
 
-function populateCameraOptions(cameras) {
-  const select = document.getElementById('cameraSelect');
-  select.innerHTML = '';
+   function populateCameraOptions(cameras) {
+     const select = document.getElementById('cameraSelect');
+     select.innerHTML = '';
 
-  cameras.forEach((camera, index) => {
-    const option = document.createElement('option');
-    option.value = camera.id;
-    option.textContent = camera.label || `Camera ${index + 1}`;
-    if (camera.id === currentCameraId) {
-      option.selected = true;
-    }
-    select.appendChild(option);
-  });
-}
+     cameras.forEach((camera, index) => {
+      const option = document.createElement('option');
+      option.value = camera.id;
+      option.textContent = camera.label || `Camera ${index + 1}`;
+      if (camera.id === currentCameraId) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+  }
 
-function startCamera(cameraId) {
-  html5QrCode.start(
-    cameraId,
-    { fps: 10, qrbox: { width: 250, height: 250 } },
-    qrMessage => {
-      html5QrCode.pause();
-      handleScan(qrMessage);
+  function startCamera(cameraId) {
+    html5QrCode.start(
+      cameraId,
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      qrMessage => {
+        html5QrCode.pause();
+        handleScan(qrMessage);
     }
   ).then(() => {
     currentCameraId = cameraId;
@@ -140,15 +140,15 @@ function startCamera(cameraId) {
   });
 }
 
-function switchCamera(newCameraId) {
-  if (newCameraId === currentCameraId) return;
+   function switchCamera(newCameraId) {
+     if (newCameraId === currentCameraId) return;
 
-  html5QrCode.stop().then(() => {
-    html5QrCode.clear();
-    startCamera(newCameraId);
-  }).catch(err => {
-    console.error("Error switching camera:", err);
-    alert("Could not switch camera.");
+     html5QrCode.stop().then(() => {
+       html5QrCode.clear();
+       startCamera(newCameraId);
+     }).catch(err => {
+      console.error("Error switching camera:", err);
+      alert("Could not switch camera.");
   });
 }
 
@@ -213,7 +213,7 @@ function switchCamera(newCameraId) {
     }
 
     // ✅ Start scanner after full page load
-window.addEventListener("load", initScanner);
+    window.addEventListener("load", initScanner);
   </script>
 </body>
 </html>
