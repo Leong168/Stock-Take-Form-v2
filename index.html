@@ -83,11 +83,15 @@
     const html5QrCode = new Html5Qrcode("reader");
     const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-    let html5QrCode;
+   let html5QrCode;
 let currentCameraId = '';
 let cameraList = [];
 
-function startScanner() {
+function initScanner() {
+  // First create the instance
+  html5QrCode = new Html5Qrcode("reader");
+
+  // Request permission by starting/stopping a quick scan
   Html5Qrcode.getCameras().then(cameras => {
     if (!cameras || cameras.length === 0) {
       alert("No camera found.");
@@ -95,23 +99,21 @@ function startScanner() {
     }
 
     cameraList = cameras;
-    populateCameraOptions(cameras);
-
-    // Default to back camera if available
     const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
     currentCameraId = backCamera.id;
 
-    html5QrCode = new Html5Qrcode("reader");
+    populateCameraOptions(cameras);
     startCamera(currentCameraId);
   }).catch(err => {
     console.error("Camera error:", err);
-    alert("Could not start scanner.");
+    alert("Could not access camera. Please allow camera permissions.");
   });
 }
 
 function populateCameraOptions(cameras) {
   const select = document.getElementById('cameraSelect');
   select.innerHTML = '';
+
   cameras.forEach((camera, index) => {
     const option = document.createElement('option');
     option.value = camera.id;
@@ -134,8 +136,7 @@ function startCamera(cameraId) {
   ).then(() => {
     currentCameraId = cameraId;
   }).catch(err => {
-    console.error("Error starting camera:", err);
-    alert("Failed to start camera.");
+    console.error("Failed to start camera:", err);
   });
 }
 
