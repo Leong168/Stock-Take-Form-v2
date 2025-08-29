@@ -54,7 +54,7 @@
           <div class="mb-2">
             <label for="quantity" class="form-label">Quantity</label>
             <input type="number" id="quantity" class="form-control" min="1">
-          </div>
+        </div>
           <button class="btn btn-primary w-100" onclick="addEntry()">Add to List 添加到列表 </button>
           <button class="btn btn-secondary w-100 mt-2" onclick="rescan()">🔁 Rescan 重新扫描</button>
         </div>
@@ -203,7 +203,7 @@
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "sku_entries.xlsx";
+      anchor.download = "v2_sku_entries.xlsx";
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
