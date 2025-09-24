@@ -207,7 +207,8 @@
         function handleScan(sku) {
             lastScannedSKU = sku;
             document.getElementById('skuName').value = sku;
-            document.getElementById('quantity').value = '1'; // Default quantity to 1 for quick entry
+            // *** RECTIFIED: Leave quantity blank instead of setting '1' ***
+            document.getElementById('quantity').value = ''; 
             document.getElementById('form-section').classList.remove('d-none');
             document.getElementById('quantity').focus();
         }
