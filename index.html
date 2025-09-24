@@ -1,221 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SKU Scanner App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>SKU Scanner App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <style>
-    #reader {
-      width: 100%;
-      max-height: 80vh;
-    }
-    .scrollable-table {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-  </style>
+    <style>
+        #reader {
+            width: 100%;
+            max-height: 80vh;
+        }
+        .scrollable-table {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-  <div class="container py-3">
+    <div class="container py-3">
 
-    <h3 class="text-center mb-3">📦 SKU Scanner</h3>
+        <h3 class="text-center mb-3">📦 SKU Scanner</h3>
 
-        <div id="login-page">
-      <div class="card p-4 shadow-sm">
-        <h4 class="card-title text-center">Login</h4>
-        <div class="mb-3">
-          <label for="userName" class="form-label">Name</label>
-          <input type="text" id="userName" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label for="userLocation" class="form-label">Location</label>
-          <input type="text" id="userLocation" class="form-control" required>
-        </div>
-        <button class="btn btn-primary w-100" onclick="login()">Start Scanning</button>
-      </div>
-    </div>
+        <div id="login-page">
+            <div class="card p-4 shadow-sm">
+                <h4 class="card-title text-center">Login</h4>
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Name</label>
+                    <input type="text" id="userName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userLocation" class="form-label">Location</label>
+                    <input type="text" id="userLocation" class="form-control" required>
+                </div>
+                <button class="btn btn-primary w-100" onclick="login()">Start Scanning</button>
+            </div>
+        </div>
 
-        <div id="main-app" class="d-none">
-            <div id="reader" class="mb-3"></div>
+        <div id="main-app" class="d-none">
+            <div id="reader" class="mb-3"></div>
 
-            <div id="form-section" class="d-none">
-        <div class="card p-3 shadow-sm">
-          <div class="mb-2">
-            <label for="skuName" class="form-label">SKU</label>
-            <input type="text" id="skuName" class="form-control" readonly>
-        </div>
-          <div class="mb-2">
-            <label for="quantity" class="form-label">Quantity</label>
-            <input type="number" id="quantity" class="form-control" min="1">
-        </div>
-          <button class="btn btn-primary w-100" onclick="addEntry()">Add to List 添加到列表 </button>
-          <button class="btn btn-secondary w-100 mt-2" onclick="rescan()">🔁 Rescan 重新扫描</button>
-        </div>
-      </div>
+            <div id="form-section" class="d-none">
+                <div class="card p-3 shadow-sm">
+                    <div class="mb-2">
+                        <label for="skuName" class="form-label">SKU</label>
+                        <input type="text" id="skuName" class="form-control" readonly>
+                    </div>
+                    <div class="mb-2">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" id="quantity" class="form-control" min="1" inputmode="numeric">
+                    </div>
+                    <button class="btn btn-primary w-100" onclick="addEntry()">Add to List 添加到列表 </button>
+                    <button class="btn btn-secondary w-100 mt-2" onclick="rescan()">🔁 Rescan 重新扫描</button>
+                </div>
+            </div>
 
-            <div class="mt-4">
-        <h5>Scanned Entries</h5>
-        <div class="scrollable-table border rounded bg-white">
-          <table class="table table-sm table-striped mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>#</th>
-                <th>SKU</th>
-                <th>Quantity</th>
-              </tr>
-            </thead>
-            <tbody id="entryTable"></tbody>
-          </table>
-        </div>
-      </div>
+            <div class="mt-4">
+                <h5>Scanned Entries</h5>
+                <div class="scrollable-table border rounded bg-white">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>SKU</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entryTable"></tbody>
+                    </table>
+                </div>
+            </div>
 
-            <div class="mt-3">
-        <button class="btn btn-success w-100" onclick="exportToExcel()">⬇️ Export to Excel 数据导出</button>
-      </div>
-    </div>
-  </div>
+            <div class="mt-3">
+                <button class="btn btn-success w-100" onclick="exportToExcel()">⬇️ Export to Excel 数据导出</button>
+                <button class="btn btn-danger w-100 mt-2" onclick="clearAllData()">❌ Clear All Data 清除数据</button>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    let lastScannedSKU = '';
-    let entries = [];
-    let userName = '';
-    let userLocation = '';
+    <script>
+        let lastScannedSKU = '';
+        let entries = [];
+        let userName = '';
+        let userLocation = '';
 
-    const html5QrCode = new Html5Qrcode("reader");
-    const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
+        const html5QrCode = new Html5Qrcode("reader");
+        const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-    function login() {
-      userName = document.getElementById('userName').value.trim();
-      userLocation = document.getElementById('userLocation').value.trim();
+        // =======================================================
+        // DATA PERSISTENCE FUNCTIONS (localStorage)
+        // =======================================================
 
-      if (userName === '' || userLocation === '') {
-        alert("Please enter your name and location.");
-        return;
-      }
+        function saveState() {
+            // Save current data and login info to browser's local storage
+            localStorage.setItem('skuScannerEntries', JSON.stringify(entries));
+            localStorage.setItem('userName', userName);
+            localStorage.setItem('userLocation', userLocation);
+        }
 
-      document.getElementById('login-page').classList.add('d-none');
-      document.getElementById('main-app').classList.remove('d-none');
-      startScanner();
-    }
+        function loadState() {
+            // Load data from local storage on page load
+            const savedEntries = localStorage.getItem('skuScannerEntries');
+            const savedName = localStorage.getItem('userName');
+            const savedLocation = localStorage.getItem('userLocation');
 
-    function startScanner() {
-      Html5Qrcode.getCameras().then(cameras => {
-        if (!cameras || cameras.length === 0) {
-          alert("No camera found.");
-          return;
-        }
-        const backCamera = cameras.find(c => c.label.toLowerCase().includes("back")) || cameras[0];
-        html5QrCode.start(
-          { facingMode: "environment" },
-          qrConfig,
-          qrMessage => {
-            html5QrCode.pause();
-            handleScan(qrMessage);
-          }
-        );
-      }).catch(err => {
-        console.error("Camera error:", err);
-        alert("Could not start scanner.");
-      });
-    }
+            if (savedEntries) {
+                entries = JSON.parse(savedEntries);
+                updateTable(); // Refresh the table with loaded data
+            }
 
-    function handleScan(sku) {
-      lastScannedSKU = sku;
-      document.getElementById('skuName').value = sku;
-      document.getElementById('quantity').value = '';
-      document.getElementById('form-section').classList.remove('d-none');
-      document.getElementById('quantity').focus();
-    }
+            if (savedName && savedLocation) {
+                // Restore login fields if data is present
+                userName = savedName;
+                userLocation = savedLocation;
+                document.getElementById('userName').value = userName;
+                document.getElementById('userLocation').value = userLocation;
+            }
+        }
 
-    function addEntry() {
-      const qty = parseInt(document.getElementById('quantity').value);
-      if (!qty || qty <= 0) {
-        alert("Enter a valid quantity.");
-        return;
-      }
-      const now = new Date();
-      const dateString = now.toLocaleDateString(); // e.g., "M/D/YYYY"
-      const timeString = now.toLocaleTimeString(); // e.g., "h:mm:ss AM/PM"
-      const fullDate = `${dateString} ${timeString}`;
-      entries.push({
-        name: userName,
-        location: userLocation,
-        sku: lastScannedSKU,
-        quantity: qty,
-        date: fullDate
-      });
-      updateTable();
-      document.getElementById('form-section').classList.add('d-none');
-      html5QrCode.resume();
-    }
+        function clearAllData() {
+            if (!confirm("Are you sure you want to clear ALL scanned entries and your login info? This cannot be undone.")) {
+                return;
+            }
 
-    function rescan() {
-      document.getElementById('form-section').classList.add('d-none');
-      html5QrCode.resume();
-    }
+            // Clear in-memory data
+            entries = [];
+            userName = '';
+            userLocation = '';
 
-    function updateTable() {
-      const tableBody = document.getElementById("entryTable");
-      tableBody.innerHTML = '';
-      entries.forEach((item, index) => {
-        const row = `<tr>
-          <td>${index + 1}</td>
-          <td>${item.sku}</td>
-          <td>${item.quantity}</td>
-        </tr>`;
-        tableBody.insertAdjacentHTML("beforeend", row);
-      });
-    }
+            // Clear localStorage
+            localStorage.removeItem('skuScannerEntries');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userLocation');
 
-    function exportToExcel() {
-      if (entries.length === 0) {
-        alert("No entries to export.");
-        return;
-      }
+            // Update UI and reset app state
+            updateTable();
+            document.getElementById('login-page').classList.remove('d-none');
+            document.getElementById('main-app').classList.add('d-none');
+            document.getElementById('userName').value = '';
+            document.getElementById('userLocation').value = '';
 
-      const worksheet = XLSX.utils.json_to_sheet(entries, {
-        header: ["name", "location", "sku", "quantity", "date"]
-      });
-      // Map headers to A, B, C, D, E
-      const newHeaders = {
-        A: 'Name',
-        B: 'Location',
-        C: 'SKU',
-        D: 'Quantity',
-        E: 'Date'
-      };
-      XLSX.utils.sheet_add_aoa(worksheet, [['Name', 'Location', 'SKU', 'Quantity', 'Date']], { origin: 'A1' });
+            // Stop scanner if it's running
+            if (html5QrCode.isScanning) {
+                html5QrCode.stop().catch(err => console.error("Error stopping scanner:", err));
+            }
 
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Entries");
+            alert("All data has been cleared.");
+        }
 
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        // =======================================================
+        // APP LOGIC FUNCTIONS
+        // =======================================================
 
-      const url = window.URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      
-      // Generate file name with v2_Name_Location_Date format
-      const today = new Date();
-      const dateStr = today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
-      const fileName = `v2_${userName.replace(/ /g, '_')}_${userLocation.replace(/ /g, '_')}_${dateStr}.xlsx`;
-      
-      anchor.download = fileName;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      window.URL.revokeObjectURL(url);
-    }
+        function login() {
+            userName = document.getElementById('userName').value.trim();
+            userLocation = document.getElementById('userLocation').value.trim();
 
-    // Do not start scanner on load. Wait for login.
-  </script>
+            if (userName === '' || userLocation === '') {
+                alert("Please enter your name and location.");
+                return;
+            }
+
+            saveState(); // Save login info
+            document.getElementById('login-page').classList.add('d-none');
+            document.getElementById('main-app').classList.remove('d-none');
+            startScanner();
+        }
+
+        function startScanner() {
+            // Ensure the scanner is not running before starting
+            if (html5QrCode.isScanning) {
+                html5QrCode.stop().catch(err => console.error("Error stopping scanner:", err));
+            }
+            
+            Html5Qrcode.getCameras().then(cameras => {
+                if (!cameras || cameras.length === 0) {
+                    alert("No camera found.");
+                    return;
+                }
+                // Prefer the 'environment' (back) camera
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    qrConfig,
+                    qrMessage => {
+                        html5QrCode.pause();
+                        handleScan(qrMessage);
+                    },
+                    errorMessage => {
+                        // Optional: console.log(`Scanner Error: ${errorMessage}`);
+                    }
+                ).catch(err => {
+                     console.error("Camera start error:", err);
+                     alert("Could not start scanner. Ensure camera permissions are granted.");
+                });
+            }).catch(err => {
+                console.error("Camera detection error:", err);
+                alert("Could not start scanner.");
+            });
+        }
+
+        function handleScan(sku) {
+            lastScannedSKU = sku;
+            document.getElementById('skuName').value = sku;
+            document.getElementById('quantity').value = '1'; // Default quantity to 1 for quick entry
+            document.getElementById('form-section').classList.remove('d-none');
+            document.getElementById('quantity').focus();
+        }
+
+        function addEntry() {
+            const qty = parseInt(document.getElementById('quantity').value);
+            if (!qty || qty <= 0) {
+                alert("Enter a valid quantity.");
+                return;
+            }
+            const now = new Date();
+            const dateString = now.toLocaleDateString();
+            const timeString = now.toLocaleTimeString();
+            const fullDate = `${dateString} ${timeString}`;
+
+            entries.push({
+                name: userName,
+                location: userLocation,
+                sku: lastScannedSKU,
+                quantity: qty,
+                date: fullDate
+            });
+
+            saveState(); // Save data after adding a new entry
+            updateTable();
+            document.getElementById('form-section').classList.add('d-none');
+            html5QrCode.resume();
+        }
+
+        function rescan() {
+            document.getElementById('form-section').classList.add('d-none');
+            html5QrCode.resume();
+        }
+
+        function updateTable() {
+            const tableBody = document.getElementById("entryTable");
+            tableBody.innerHTML = '';
+            // Display only the last 10 entries in the quick-view table for performance
+            const displayEntries = entries.slice(-10); 
+            displayEntries.forEach((item, index) => {
+                const globalIndex = entries.length - displayEntries.length + index + 1;
+                const row = `<tr>
+                    <td>${globalIndex}</td>
+                    <td>${item.sku}</td>
+                    <td>${item.quantity}</td>
+                </tr>`;
+                tableBody.insertAdjacentHTML("beforeend", row);
+            });
+            // Scroll to the bottom to show the newest entry
+            const scrollableDiv = document.querySelector('.scrollable-table');
+            if (scrollableDiv) {
+                scrollableDiv.scrollTop = scrollableDiv.scrollHeight;
+            }
+        }
+
+        function exportToExcel() {
+            if (entries.length === 0) {
+                alert("No entries to export.");
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(entries, {
+                header: ["name", "location", "sku", "quantity", "date"]
+            });
+            
+            // Add header row explicitly and format column names
+            XLSX.utils.sheet_add_aoa(worksheet, [['Name', 'Location', 'SKU', 'Quantity', 'Date']], { origin: 'A1' });
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Entries");
+
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+            const url = window.URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            
+            // Generate file name: v2_Name_Location_Date.xlsx
+            const today = new Date();
+            const dateStr = today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getDate().toString().padStart(2, '0');
+            // Sanitize name/location for filename
+            const safeUserName = userName.replace(/ /g, '_').replace(/[^\w-]/g, '');
+            const safeUserLocation = userLocation.replace(/ /g, '_').replace(/[^\w-]/g, '');
+            const fileName = `v2_${safeUserName}_${safeUserLocation}_${dateStr}.xlsx`;
+            
+            anchor.download = fileName;
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Call loadState when the page is fully loaded to restore previous session data
+        document.addEventListener('DOMContentLoaded', loadState); 
+    </script>
 </body>
 </html>
